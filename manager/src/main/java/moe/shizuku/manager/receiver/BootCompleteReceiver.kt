@@ -15,7 +15,6 @@ import moe.shizuku.manager.ShizukuSettings
 import moe.shizuku.manager.ShizukuSettings.KEEP_START_ON_BOOT_WIRELESS
 import moe.shizuku.manager.ShizukuSettings.LaunchMethod
 import moe.shizuku.manager.ShizukuSettings.getPreferences
-import moe.shizuku.manager.adb.WirelessADBHelper.validateThenEnableWirelessAdb
 import moe.shizuku.manager.starter.Starter
 import moe.shizuku.manager.starter.SelfStarterService
 import rikka.shizuku.Shizuku
@@ -54,24 +53,24 @@ class BootCompleteReceiver : BroadcastReceiver() {
     private fun start(context: Context, startOnBootWirelessIsEnabled: Boolean) {
 
         if (!Shell.rootAccess()) {
+            // If Shizuku ADB AutoStart Setting is Enabled, and WRITE_SECURE_SETTINGS is Granted:
             if (startOnBootWirelessIsEnabled && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED) {
-                Log.i(AppConstants.TAG, "WRITE_SECURE_SETTINGS is enabled and user has Start on boot is enabled for wireless ADB")
+                Log.i(AppConstants.TAG, "Attempting Shizuku Shell Server AutoStart...")
                 try {
-                    val wirelessAdbStatus = validateThenEnableWirelessAdb(context.contentResolver, context)
-                    if (wirelessAdbStatus) {
+                    //val wirelessAdbStatus = validateThenEnableWirelessAdb(context.contentResolver, context)
+                    //if (wirelessAdbStatus) {
                         val intentService = Intent(context, SelfStarterService::class.java)
                         context.startService(intentService)
-                    }
+                    //}
                 } catch (e: SecurityException) {
                     e.printStackTrace()
-                    Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Shizuku AutoStart Failed", Toast.LENGTH_SHORT).show()
                 }
-            } else
-            //NotificationHelper.notify(context, AppConstants.NOTIFICATION_ID_STATUS, AppConstants.NOTIFICATION_CHANNEL_STATUS, R.string.notification_service_start_no_root)
-                return
+            }
+            return
+        } else {
+            Starter.writeDataFiles(context)
+            Shell.su(Starter.dataCommand).exec()
         }
-
-        Starter.writeDataFiles(context)
-        Shell.su(Starter.dataCommand).exec()
     }
 }

@@ -17,8 +17,8 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import moe.shizuku.manager.R
 import moe.shizuku.manager.adb.AdbMdns
-import moe.shizuku.manager.adb.WirelessADBHelper.callStartAdb
 import moe.shizuku.manager.databinding.AdbDialogBinding
+import moe.shizuku.manager.starter.StarterActivity
 import moe.shizuku.manager.utils.EnvironmentUtils
 
 @RequiresApi(Build.VERSION_CODES.R)
@@ -81,7 +81,12 @@ class AdbDialogFragment : DialogFragment() {
 
     private fun startAndDismiss(port: Int) {
         val host = "127.0.0.1"
-        callStartAdb(requireContext(), host, port)
+        val intent = Intent(context, StarterActivity::class.java).apply {
+            putExtra(StarterActivity.EXTRA_IS_ROOT, false)
+            putExtra(StarterActivity.EXTRA_HOST, host)
+            putExtra(StarterActivity.EXTRA_PORT, port)
+        }
+        requireContext().startActivity(intent)
         dismissAllowingStateLoss()
     }
 

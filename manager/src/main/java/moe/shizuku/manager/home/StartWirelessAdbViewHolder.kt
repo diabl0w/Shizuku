@@ -13,10 +13,10 @@ import androidx.fragment.app.FragmentActivity
 import moe.shizuku.manager.Helps
 import moe.shizuku.manager.R
 import moe.shizuku.manager.adb.AdbPairingTutorialActivity
-import moe.shizuku.manager.adb.WirelessADBHelper.callStartAdb
 import moe.shizuku.manager.databinding.HomeItemContainerBinding
 import moe.shizuku.manager.databinding.HomeStartWirelessAdbBinding
 import moe.shizuku.manager.ktx.toHtml
+import moe.shizuku.manager.starter.StarterActivity
 import moe.shizuku.manager.utils.CustomTabsHelper
 import moe.shizuku.manager.utils.EnvironmentUtils
 import rikka.core.content.asActivity
@@ -71,7 +71,12 @@ class StartWirelessAdbViewHolder(binding: HomeStartWirelessAdbBinding, root: Vie
         val port = EnvironmentUtils.getAdbTcpPort()
         if (port > 0) {
             val host = "127.0.0.1"
-            callStartAdb(context, host, port)
+            val intent = Intent(context, StarterActivity::class.java).apply {
+                putExtra(StarterActivity.EXTRA_IS_ROOT, false)
+                putExtra(StarterActivity.EXTRA_HOST, host)
+                putExtra(StarterActivity.EXTRA_PORT, port)
+            }
+            context.startActivity(intent)
         } else {
             WadbNotEnabledDialogFragment().show(context.asActivity<FragmentActivity>().supportFragmentManager)
         }

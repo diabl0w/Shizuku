@@ -24,6 +24,7 @@ android {
     buildFeatures {
         viewBinding true
         prefab true
+        buildConfig true
     }
     signingConfigs {
         sign
@@ -35,8 +36,8 @@ android {
         }
         release {
             signingConfig signingConfigs.sign
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
